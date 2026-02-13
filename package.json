@@ -1,0 +1,26 @@
+{
+  "name": "tu-proyecto-cypress",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run:server": "json-server --watch db.json",
+    "e2e:chrome": "cypress run --browser chrome",
+    "cy:open": "cypress open",
+    "test:headless": "cypress run",
+    "cypress:open:dev": "npx cypress open --env CYPRESS_ENV=dev",
+    "cypress:open:qa": "npx cypress open --env CYPRESS_ENV=qa",
+    "cypress:open:prod": "npx cypress run --env CYPRESS_ENV=prod"
+  },
+  "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "^20.0.0",
+    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
+    "cypress": "^13.0.0",
+    "esbuild": "^0.20.0"
+  },
+  "cypress-cucumber-preprocessor": {
+   "stepDefinitions": [
+    "cypress/e2e/step_definitions/**/*.{js,ts}",
+    "cypress/e2e/features/common/**/*.{js,ts}"
+  ]
+  }
+}

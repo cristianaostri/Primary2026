@@ -9,18 +9,30 @@
     "test:headless": "cypress run",
     "cypress:open:dev": "npx cypress open --env CYPRESS_ENV=dev",
     "cypress:open:qa": "npx cypress open --env CYPRESS_ENV=qa",
-    "cypress:open:prod": "npx cypress run --env CYPRESS_ENV=prod"
+    "cypress:open:prod": "npx cypress run --env CYPRESS_ENV=prod",
+    "cypress:open": "npm run vpn:connect && npx cypress open",
+    "vpn:connect": "./cypress/connect_vpn.sh",
+    "clean:reports": "rm -rf cypress/reports",
+    "pretest:master": "npm run clean:reports",
+    "test:run": "npx cypress run --browser chrome",
+    "report:rename": "mv cypress/reports/temp_jsons/index.html \"cypress/reports/report_${CYPRESS_ENV:-qa}_$(date +%Y%m%d_%H%M).html\"",
+    "clean:temp": "rm -rf cypress/reports/temp_jsons",
+    "report:open": "xdg-open \"cypress/reports/$(ls -t cypress/reports | grep .html | head -1)\"",
+    "test:master": "npm run test:run ; npm run report:merge && npm run report:generate ; npm run report:rename && npm run report:open && npm run clean:temp"
   },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "^20.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "cypress": "^13.0.0",
-    "esbuild": "^0.20.0"
+    "cypress-mochawesome-reporter": "^3.8.4",
+    "esbuild": "^0.20.0",
+    "mochawesome-merge": "^4.3.0",
+    "mochawesome-report-generator": "^6.2.0"
   },
   "cypress-cucumber-preprocessor": {
-   "stepDefinitions": [
-    "cypress/e2e/step_definitions/**/*.{js,ts}",
-    "cypress/e2e/features/common/**/*.{js,ts}"
-  ]
+    "stepDefinitions": [
+      "cypress/e2e/step_definitions/**/*.{js,ts}",
+      "cypress/e2e/features/common/**/*.{js,ts}"
+    ]
   }
 }

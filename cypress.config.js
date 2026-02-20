@@ -1,32 +1,36 @@
-const { defineConfig } = require("cypress");
+const { defineConfig } = require("cypress")
 const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
 const addCucumberPreprocessorPlugin = require("@badeball/cypress-cucumber-preprocessor").addCucumberPreprocessorPlugin;
 const createEsbuildPlugin = require("@badeball/cypress-cucumber-preprocessor/esbuild").createEsbuildPlugin;
 
 module.exports = defineConfig({
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    reportDir: 'cypress/reports/temp_jsons', 
+    charts: true,
+    reportPageTitle: 'OneClearing Automation Report',
+    embeddedScreenshots: true,
+    inlineAssets: true, 
+    saveAllAttempts: false,
+  },
   e2e: {
     specPattern: "cypress/e2e/features/**/*.feature",
     async setupNodeEvents(on, config) {
+      // 1. Registro de plugins
       await addCucumberPreprocessorPlugin(on, config);
+      require('cypress-mochawesome-reporter/plugin')(on); 
 
       on("file:preprocessor", createBundler({
         plugins: [createEsbuildPlugin(config)],
       }));
 
-      // 1. Determinar el ambiente
+      // 2. Gestión de ambientes
       const version = config.env.CYPRESS_ENV || 'qa';
-      
-      // 2. Cargar el archivo correspondiente
       const envConfigs = require(`./cypress/support/environments/${version}.js`);
+      config.baseUrl = envConfigs.baseUrl;
+      config.env = { ...config.env, ...envConfigs };
 
-      // 3. INYECTAR EN CONFIG (Clave para que no salga null/undefined)
-      config.baseUrl = envConfigs.baseUrl; // Setea la URL base del sistema
-      config.env = {
-        ...config.env,
-        ...envConfigs // Setea todas las demás (authApiUrl, etc.)
-      };
-
-      return config; // IMPORTANTE: Devolver la configuración modificada
+      return config; 
     },
   },
 });
